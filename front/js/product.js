@@ -51,33 +51,71 @@ function createColor(color){ /* add color option to the select menu*/
 
     colors.appendChild(option);
 }
-let cart = []
 
-function addToCart() {
 
-    let cartStorage = localStorage.getItem('products');
 
-    cart.id = productId;
+function addToCart() {/*add item to cartContent in localStorage*/
 
-    cart.quantity = document.getElementById('quantity').value;
-
-    cart.color = document.getElementById('colors').value;
-
-    localStorage.setItem('products', JSON.stringify(cart));
-
-    console.log(localStorage.getItem('products'));
-
-    for(product of cartStorage){
-
+    let cartStorage = JSON.parse(localStorage.getItem('cartContent'));
+    let quantity = parseInt(document.getElementById('quantity').value);
+    let color = document.getElementById('colors').value;
+    if(!cartStorage){
+        let cart = {
+            id : productId,
+            quantity : quantity,
+            color : color
+        }
+        localStorage.setItem('cartContent', JSON.stringify([cart]));
+    }else {
+        let alreadyExist = false;
+        cartStorage.forEach((element, index) => {
+            if(element.id === productId && element.color === color){
+                cartStorage[index].quantity += quantity;
+                localStorage.setItem('cartContent', JSON.stringify(cartStorage));
+                return alreadyExist = true;
+            }
+        })
+        if(!alreadyExist){
+            cartStorage.push({
+                id : productId,
+                quantity : quantity,
+                color : color
+            })
+            localStorage.setItem('cartContent', JSON.stringify(cartStorage));
+        }
     }
 
+
+
 }
+
+
+document.getElementById('addToCart').disabled = true;
+
+function isProductValid(){/*Check if selected product is valid (a color is selected or quantity > 0 )*/
+    let colorOption = document.getElementById('colors').value;
+    let quantity = document.getElementById('quantity').value;
+    document.getElementById('addToCart').disabled = !colorOption || quantity === '0';
+}
+
+let inputQuantity = document.getElementById('quantity');
+inputQuantity.addEventListener('input', () =>{
+    isProductValid();
+})
+
+let colorSelect = document.getElementById('colors');
+colorSelect.addEventListener('input', () => {
+    isProductValid();
+})
+
 
 let cartButton = document.getElementById('addToCart');
 cartButton.addEventListener('click', function (){
     addToCart();
+    console.log(localStorage.getItem('cartContent'))
 });
 
+/*localStorage.clear();*/
 
 
 
