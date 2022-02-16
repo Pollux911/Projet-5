@@ -2,24 +2,36 @@ let cart = JSON.parse(localStorage.getItem('cartContent'));
 console.table(cart);
 
 const cartItems = document.getElementById('cart__items');
-/*let priceArray = []*/
+
 let cartPrice = 0;
+/*let priceArray= [];*/
+
 cart.forEach((element, index) => {
-    fetch(`http://localhost:3000/api/products/${element.id}`)
-        .then(function (res){
-            if(res.ok) {
-                return res.json();
-            } else {
-                console.log("error with API", res)
-            }
-        })
-        .then(function (product){
-            let apiProduct = createCartContent(product, cart[index])
-            cartItems.appendChild(apiProduct);
-            totalOfCart(product, cart[index]);
-            /*priceArray.push(product.price);*/
-        })
-})
+        fetch(`http://localhost:3000/api/products/${element.id}`)
+            .then(function (res){
+                if(res.ok) {
+                    return res.json();
+                } else {
+                    console.log("error with API", res)
+                }
+            })
+            .then(function (product){
+                let apiProduct = createCartContent(product, cart[index])
+                cartItems.appendChild(apiProduct);
+                totalOfCart(product, cart[index]);
+
+                /*changeQuantity();
+                deleteButton();*/
+            })
+            .then(function (){
+                createDeleteButton(index);
+                changeQuantity(index);
+            })
+    })
+
+
+
+
 
 totalOfProducts();
 
@@ -31,14 +43,13 @@ function totalOfProducts(){
 }
 
 function totalOfCart(product, cart){
+
     const totalPrice = document.getElementById('totalPrice');
     cartPrice += product.price *  cart.quantity;
-    /*console.log('la qtt',product.price,'le price ', cart.price);*/
-    console.log(cartPrice);
+    /*console.log(cartPrice);*/
     totalPrice.innerText = cartPrice;
+    console.log(cartPrice, 'total du panier')
 }
-
-
 
 
 
@@ -75,7 +86,8 @@ function createCartContent(product, cart) {
     itemDescriptionDiv.appendChild(productColor);
 
     const productPrice = document.createElement('p');
-    productPrice.innerText = product.price + '€ * ' + cart.quantity + ' = ' + product.price *  cart.quantity + ' €'; /*Price * Quantity*/
+    /*productPrice.setAttribute('data-price', product.price);*/
+    productPrice.innerText = product.price + '€' /*'€ * ' + cart.quantity + ' = ' + product.price * cart.quantity + ' €'*/;
     itemDescriptionDiv.appendChild(productPrice);
 
     const itemSettings = document.createElement('div');
@@ -112,23 +124,154 @@ function createCartContent(product, cart) {
 }
 
 
-/*
-changeQuantity();
 
-function changeQuantity(){
-    let inputQuantity = document.querySelectorAll('.itemQuantity')
-    console.log(inputQuantity);
-    inputQuantity.forEach((element) => {
+
+function changeQuantity(index) {
+
+    let inputQuantity = document.querySelectorAll('.itemQuantity');
+
+    /*let priceRow = document.querySelectorAll('.cart__item__content p:nth-child(3)');*/ /*get the DOM element for the price*/
+
+    console.log(inputQuantity.item(index), 'l index de la nodelist');
+    inputQuantity.item(index).addEventListener('change', (e) => {
+        let itemQuantity = e.target.closest('.itemQuantity');
+        let article = e.target.closest('article')
+        let productIndex = cart.findIndex((product) =>
+            product.id === article.dataset.id &&
+            product.color === article.dataset.color);
+        cart[productIndex].quantity = itemQuantity.valueAsNumber;
+        console.log(itemQuantity.valueAsNumber, '   quantité modifié');
+
+        if (cart[productIndex].quantity === 0) {
+            deleteProduct(article, productIndex)
+            console.log(e, 'quantité a 0 => suppression')
+            return
+        }
+        totalOfProducts();
+        recalculateCart();
+        localStorage.setItem('cartContent', JSON.stringify(cart));
+
+    });
+}
+
+    /*inputQuantity.forEach((element) => { old change quantity
+
+        console.log(element, 'c koi lelem')
         element.addEventListener('change', (e) => {
-            let quantity = e.target.closest('');
+            let itemQuantity = e.target.closest('.itemQuantity');
+            let article = e.target.closest('article')
+            let productIndex= cart.findIndex((product) =>
+                             product.id === article.dataset.id &&
+                             product.color === article.dataset.color);
+            cart[productIndex].quantity = itemQuantity.valueAsNumber;
+            console.log(itemQuantity.valueAsNumber, '   quantité modifié');
 
-            console.log(quantity);
-        });
+            if(cart[productIndex].quantity === 0){
+                deleteProduct(article, productIndex)
+                console.log(e, 'alerte')
+                return
+            }
+            totalOfProducts();
+            recalculateCart();
+            localStorage.setItem('cartContent', JSON.stringify(cart));})
+    })*/
 
-    })
 
+            /*fetch(`http://localhost:3000/api/products/${cart[productIndex].id}`) /!*Get price from API*!/
+                .then(function (res){
+                    if(res.ok) {
+                        return res.json();
+                    } else {
+                        console.log("error with API", res);
+                    }
+                })
+                .then(function (product){
+                    priceRow[productIndex].innerText = product.price + '€ * ' + cart[productIndex].quantity
+                        + ' = ' + product.price * cart[productIndex].quantity + ' €';
+                    return product.price
+            })*/
+
+            /*let price = priceRow[productIndex].dataset.price; /!*get Price from DOM*!/
+            priceRow[productIndex].innerText = price + '€ * ' + cart[productIndex].quantity
+                + ' = ' + price * cart[productIndex].quantity + ' €';
+
+
+            console.log(price, 'ui');*/
+        /*});*/
+
+
+function recalculateCart(){
+    const totalPrice = document.getElementById('totalPrice');
+    let cartPrice = 0
+    if (cart.length === 0){
+        totalPrice.innerText = cartPrice;
+        setTimeout(() => {window.alert("Votre panier est vide!"); }, 100)
+    } else (cart.forEach((element, index) => {
+        fetch(`http://localhost:3000/api/products/${element.id}`)
+            .then(function (res){
+                if(res.ok) {
+                    return res.json();
+                } else {
+                    console.log("error with API", res)
+                }
+            })
+            .then(function (product){
+                cartPrice += product.price *  cart[index].quantity;
+                totalPrice.innerText = cartPrice;
+            })
+    }))
 
 }
 
-*/
+function deleteProduct(item, cartIndex){
+    cart.splice(cartIndex, 1);
+    item.remove();
+    totalOfProducts();
+    recalculateCart();
+    localStorage.setItem('cartContent', JSON.stringify(cart));
+}
+
+function createDeleteButton(index){
+
+    let inputDelete = document.querySelectorAll('.deleteItem');
+    let deleteButton = inputDelete.item(index);
+    console.log(inputDelete.item(index), 'l index de ses morts');
+    deleteButton.addEventListener('click', (e) => {
+        let article = e.target.closest('article');
+        let cartIndex = cart.findIndex((product) =>
+            product.id === article.dataset.id &&
+            product.color === article.dataset.color);
+       /* console.log(article, 'larticle')
+        console.log(cartIndex, ' lindex du cart');*/
+        deleteProduct(article, cartIndex);
+    })
+
+    /*inputDelete.forEach((element) => { old delete product
+
+        element.addEventListener('click', (e) => {
+            let article = e.target.closest('article');
+            let cartIndex= cart.findIndex((product) =>
+                product.id === article.dataset.id &&
+                product.color === article.dataset.color);
+            console.log(article, 'larticle')
+            console.log(cartIndex, ' lindex du cart');
+            deleteProduct(article, cartIndex);
+
+            /!*let itemButton = e.target.closest('[data-id]')
+            let article = e.target.closest('article')
+            let cartIndex= cart.findIndex((product) =>
+                product.id === article.dataset.id &&
+                product.color === article.dataset.color);
+            console.log(itemButton, 'alors')
+            console.log(article, 'le truc clic');
+            cart.splice(cartIndex, 1);
+            localStorage.setItem('cartContent', JSON.stringify(cart));
+            console.table('did it work ?', cart)*!/
+
+
+
+        })
+    })*/
+}
+
 
