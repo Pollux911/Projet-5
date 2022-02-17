@@ -86,7 +86,6 @@ function createCartContent(product, cart) {
     itemDescriptionDiv.appendChild(productColor);
 
     const productPrice = document.createElement('p');
-    /*productPrice.setAttribute('data-price', product.price);*/
     productPrice.innerText = product.price + '€' /*'€ * ' + cart.quantity + ' = ' + product.price * cart.quantity + ' €'*/;
     itemDescriptionDiv.appendChild(productPrice);
 
@@ -274,4 +273,115 @@ function createDeleteButton(index){
     })*/
 }
 
+form();
+
+function form(){
+    const regExpName = new RegExp('^[a-zA-Z-áàâäãåçéèêëíìîïñóòôöõú ùûüýÿæœÁÀÂÄÃÅÇÉÈÊËÍÌÎÏÑÓÒÔÖÕÚÙÛÜÝŸÆŒ-]*$');
+    const regExpAddress = new RegExp('^[a-zA-Z0-9.!#$%&áàâäãåçéèêëíìîïñóòôöõúùûüýÿæœÁÀÂÄÃÅÇÉÈÊËÍÌÎÏÑÓÒÔÖÕÚÙÛÜÝŸÆŒ]');
+    const regExpEmail = new RegExp('^[a-zA-Z0-9.!#$%&áàâäãåçéèêëíìîïñóòôöõúùûüýÿæœÁÀÂÄÃÅÇÉÈÊËÍÌÎÏÑÓÒÔÖÕÚÙÛÜÝŸÆŒ\'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$');
+
+
+    const firstName = document.getElementById('firstName');
+    const lastName = document.getElementById('lastName');
+    const address = document.getElementById('address');
+    const city = document.getElementById('city');
+    const email = document.getElementById('email');
+
+
+    firstName.addEventListener('change', (e) =>{
+
+        if(!regExpName.test(e.target.value)){
+            console.log('Prénom invalide');
+            firstName.nextElementSibling.innerText = 'Prénom invalide';
+        } else {
+            firstName.nextElementSibling.innerText = ''
+        }
+    })
+
+    lastName.addEventListener('change', (e) =>{
+        if(!regExpName.test(e.target.value)){
+            console.log('Nom invalide')
+            lastName.nextElementSibling.innerText = 'Nom invalide';
+        } else {
+            lastName.nextElementSibling.innerText = ''
+        }
+    })
+
+    address.addEventListener('change', (e) =>{
+        if(!regExpAddress.test(e.target.value)){
+            console.log('addresse invalide')
+            address.nextElementSibling.innerText = 'Adresse invalide';
+        } else {
+            address.nextElementSibling.innerText = ''
+        }
+    })
+    city.addEventListener('change', (e) =>{
+        if(!regExpName.test(e.target.value)){
+            console.log('Ville invalide')
+            city.nextElementSibling.innerText = 'Ville invalide';
+        } else {
+            city.nextElementSibling.innerText = ''
+        }
+    })
+
+    email.addEventListener('change', (e) =>{
+        if(!regExpEmail.test(e.target.value)){
+            console.log('Email invalide')
+            email.nextElementSibling.innerText = 'Email invalide';
+        } else {
+            email.nextElementSibling.innerText = ''
+        }
+    })
+
+    const order = document.getElementById('order');
+    order.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!email.nextElementSibling.innerText && !city.nextElementSibling.innerText
+                && !address.nextElementSibling.innerText && !lastName.nextElementSibling.innerText
+                && !firstName.nextElementSibling.innerText) {
+
+                let products = [];
+                let contact = {
+                    firstName: firstName.value,
+                    lastName: lastName.value,
+                    address: address.value,
+                    city: city.value,
+                    email: email.value
+                }
+                cart.forEach((element) =>{
+                    products.push(element.id);
+                })
+                console.log(products, 'recap panier')
+
+                let order = {contact, products}
+
+                fetch("http://localhost:3000/api/products/order", {
+                    method: "POST",
+                    body: JSON.stringify(order),
+                    headers: {
+                        "content-type" : "application/json",
+                    }
+                })
+                    .then(function (res){
+                        if(res.ok) {
+                            return res.json();
+                        } else {
+                            console.log("error with API", res)
+                        }
+                    })
+                    .then(function (data){
+                        /*document.getElementById('orderID').innerText = data.orderId;*/
+                        window.location = `./confirmation.html?id=${data.orderId}`;
+                        console.log(data, 'data values');
+                        console.log(data.orderId, 'l order id');
+
+                })
+
+
+            } else {
+                alert('Veuillez remplir et vérifier tous les champs du formulaire ')
+            }
+
+    })
+}
 
