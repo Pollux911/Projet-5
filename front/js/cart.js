@@ -4,7 +4,8 @@ console.table(cart);
 const cartItems = document.getElementById('cart__items');
 
 let cartPrice = 0;
-/*let priceArray= [];*/
+
+
 
 cart.forEach((element, index) => {
         fetch(`http://localhost:3000/api/products/${element.id}`)
@@ -46,7 +47,6 @@ function totalOfCart(product, cart){
 
     const totalPrice = document.getElementById('totalPrice');
     cartPrice += product.price *  cart.quantity;
-    /*console.log(cartPrice);*/
     totalPrice.innerText = cartPrice;
     console.log(cartPrice, 'total du panier')
 }
@@ -86,7 +86,6 @@ function createCartContent(product, cart) {
     itemDescriptionDiv.appendChild(productColor);
 
     const productPrice = document.createElement('p');
-    /*productPrice.setAttribute('data-price', product.price);*/
     productPrice.innerText = product.price + '€' /*'€ * ' + cart.quantity + ' = ' + product.price * cart.quantity + ' €'*/;
     itemDescriptionDiv.appendChild(productPrice);
 
@@ -156,7 +155,7 @@ function changeQuantity(index) {
 
     /*inputQuantity.forEach((element) => { old change quantity
 
-        console.log(element, 'c koi lelem')
+        console.log(element, 'lelement')
         element.addEventListener('change', (e) => {
             let itemQuantity = e.target.closest('.itemQuantity');
             let article = e.target.closest('article')
@@ -168,7 +167,7 @@ function changeQuantity(index) {
 
             if(cart[productIndex].quantity === 0){
                 deleteProduct(article, productIndex)
-                console.log(e, 'alerte')
+                console.log(e, 'suppression')
                 return
             }
             totalOfProducts();
@@ -196,7 +195,7 @@ function changeQuantity(index) {
                 + ' = ' + price * cart[productIndex].quantity + ' €';
 
 
-            console.log(price, 'ui');*/
+            console.log(price, 'le prix');*/
         /*});*/
 
 
@@ -235,7 +234,7 @@ function createDeleteButton(index){
 
     let inputDelete = document.querySelectorAll('.deleteItem');
     let deleteButton = inputDelete.item(index);
-    console.log(inputDelete.item(index), 'l index de ses morts');
+    console.log(inputDelete.item(index), ' = l index');
     deleteButton.addEventListener('click', (e) => {
         let article = e.target.closest('article');
         let cartIndex = cart.findIndex((product) =>
@@ -262,11 +261,11 @@ function createDeleteButton(index){
             let cartIndex= cart.findIndex((product) =>
                 product.id === article.dataset.id &&
                 product.color === article.dataset.color);
-            console.log(itemButton, 'alors')
-            console.log(article, 'le truc clic');
+            console.log(itemButton, 'item bouton')
+            console.log(article, ' l article');
             cart.splice(cartIndex, 1);
             localStorage.setItem('cartContent', JSON.stringify(cart));
-            console.table('did it work ?', cart)*!/
+            console.table(cart)*!/
 
 
 
@@ -274,4 +273,118 @@ function createDeleteButton(index){
     })*/
 }
 
+form();
 
+function form(){
+    const regExpName = new RegExp('^[a-zA-Z-áàâäãåçéèêëíìîïñóòôöõú ùûüýÿæœÁÀÂÄÃÅÇÉÈÊËÍÌÎÏÑÓÒÔÖÕÚÙÛÜÝŸÆŒ-]*$');
+    const regExpAddress = new RegExp('^[a-zA-Z0-9.!#$%&áàâäãåçéèêëíìîïñóòôöõúùûüýÿæœÁÀÂÄÃÅÇÉÈÊËÍÌÎÏÑÓÒÔÖÕÚÙÛÜÝŸÆŒ]');
+    const regExpEmail = new RegExp('^[a-zA-Z0-9.!#$%&áàâäãåçéèêëíìîïñóòôöõúùûüýÿæœÁÀÂÄÃÅÇÉÈÊËÍÌÎÏÑÓÒÔÖÕÚÙÛÜÝŸÆŒ\'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$');
+
+
+    const firstName = document.getElementById('firstName');
+    const lastName = document.getElementById('lastName');
+    const address = document.getElementById('address');
+    const city = document.getElementById('city');
+    const email = document.getElementById('email');
+
+
+    firstName.addEventListener('change', (e) =>{
+
+        if(!regExpName.test(e.target.value)){
+            console.log('Prénom invalide');
+            firstName.nextElementSibling.innerText = 'Prénom invalide';
+        } else {
+            firstName.nextElementSibling.innerText = ''
+        }
+    })
+
+    lastName.addEventListener('change', (e) =>{
+        if(!regExpName.test(e.target.value)){
+            console.log('Nom invalide')
+            lastName.nextElementSibling.innerText = 'Nom invalide';
+        } else {
+            lastName.nextElementSibling.innerText = ''
+        }
+    })
+
+    address.addEventListener('change', (e) =>{
+        if(!regExpAddress.test(e.target.value)){
+            console.log('Adresse invalide')
+            address.nextElementSibling.innerText = 'Adresse invalide';
+        } else {
+            address.nextElementSibling.innerText = ''
+        }
+    })
+    city.addEventListener('change', (e) =>{
+        if(!regExpName.test(e.target.value)){
+            console.log('Ville invalide')
+            city.nextElementSibling.innerText = 'Ville invalide';
+        } else {
+            city.nextElementSibling.innerText = ''
+        }
+    })
+
+    email.addEventListener('change', (e) =>{
+        if(!regExpEmail.test(e.target.value)){
+            console.log('Email invalide')
+            email.nextElementSibling.innerText = 'Email invalide';
+        } else {
+            email.nextElementSibling.innerText = ''
+        }
+    })
+
+    const order = document.getElementById('order');
+    order.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!email.nextElementSibling.innerText && !city.nextElementSibling.innerText
+                && !address.nextElementSibling.innerText && !lastName.nextElementSibling.innerText
+                && !firstName.nextElementSibling.innerText) {
+
+                let products = [];
+                let contact = {
+                    firstName: firstName.value,
+                    lastName: lastName.value,
+                    address: address.value,
+                    city: city.value,
+                    email: email.value
+                }
+                cart.forEach((element) =>{
+                    products.push(element.id);
+                })
+                console.log(products, 'recap panier')
+
+                let order = {contact, products}
+
+                fetch("http://localhost:3000/api/products/order", {
+                    method: "POST",
+                    body: JSON.stringify(order),
+                    headers: {
+                        "content-type" : "application/json",
+                    }
+                })
+                    .then(function (res){
+                        if(res.ok) {
+                            return res.json();
+                        } else {
+                            console.log("error with API", res)
+                        }
+                    })
+                    .then(function (data){
+                        /*document.getElementById('orderID').innerText = data.orderId;*/
+                        window.location = `./confirmation.html?id=${data.orderId}`;
+                        console.log(data, 'data values');
+                        console.log(data.orderId, 'l order id');
+
+                })
+
+
+            } else {
+                alert('Veuillez remplir et vérifier tous les champs du formulaire ')
+            }
+
+    })
+}
+/*let url = new URL(window.location.href);
+let orderId = url.searchParams.get("id");
+document.getElementById('orderID').innerText = orderId;
+console.log(orderId, 'l orderid pour la confirm')*/
