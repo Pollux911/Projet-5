@@ -19,7 +19,7 @@ fetch(`http://localhost:3000/api/products/${productId}`)
         console.log("error with the API", err)
     });
 
-function showProduct(product) { /* display product w/ API data*/
+function showProduct(product) { /* Display product w/ API data*/
     const itemImage = document.querySelector(".item__img");
 
     const image = document.createElement('img');
@@ -36,13 +36,13 @@ function showProduct(product) { /* display product w/ API data*/
     const description = document.getElementById('description');
     description.innerText = product.description;
 
-    for(let color of product.colors){/*create every color options for product*/
+    for(let color of product.colors){/*Create every color options for product*/
         createColor(color);
     }
 
 }
 
-function createColor(color){ /* add color option to the select menu*/
+function createColor(color){ /* Add color option to the select menu*/
     const colors = document.getElementById("colors");
 
     let option = document.createElement('option')
@@ -54,7 +54,7 @@ function createColor(color){ /* add color option to the select menu*/
 
 
 
-function addToCart() {/*add item to cartContent in localStorage*/
+function addToCart() {/*Add item to cartContent in localStorage*/
 
     let cartStorage = JSON.parse(localStorage.getItem('cartContent'));
     let quantity = parseInt(document.getElementById('quantity').value);
@@ -96,10 +96,17 @@ function isProductValid(){/*Check if selected product is valid (a color is selec
     let colorOption = document.getElementById('colors').value;
     let quantity = document.getElementById('quantity').value;
     document.getElementById('addToCart').disabled = !colorOption || quantity === '0';
+    /*alert('Veuillez saisir une quantité et une couleur valide')*/
 }
 
 let inputQuantity = document.getElementById('quantity');
-inputQuantity.addEventListener('input', () =>{
+inputQuantity.addEventListener('input', (e) =>{
+    if (e.target.value <= 0){
+        e.target.value = 1;
+    }
+    if (e.target.value > 100){
+        e.target.value = 100;
+    }
     isProductValid();
 })
 
@@ -115,7 +122,6 @@ cartButton.addEventListener('click', function (){
     console.log(localStorage.getItem('cartContent'))
 });
 
-/*localStorage.clear();*/
 
 
 
