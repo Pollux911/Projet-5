@@ -17,7 +17,7 @@ fetch("http://localhost:3000/api/products")
         console.log("error with the API", err)
     });
 
-function createProduct(product) {
+function createProduct(product) {/*Creating products html elements*/
     const link = document.createElement('a');
     link.setAttribute('href', `./product.html?id=${product._id}`);
 

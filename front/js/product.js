@@ -19,7 +19,7 @@ fetch(`http://localhost:3000/api/products/${productId}`)
         console.log("error with the API", err)
     });
 
-function showProduct(product) { /* Display product w/ API data*/
+function showProduct(product) { /* Display product w/ API data and create color option for each available color */
     const itemImage = document.querySelector(".item__img");
 
     const image = document.createElement('img');
@@ -66,7 +66,7 @@ function addToCart() {/*Add item to cartContent in localStorage*/
             color : color
         }
         localStorage.setItem('cartContent', JSON.stringify([cart]));
-    }else {
+    } else {
         let alreadyExist = false;
         cartStorage.forEach((element, index) => {
             if(element.id === productId && element.color === color){
@@ -100,7 +100,7 @@ function isProductValid(){/*Check if selected product is valid (a color is selec
 }
 
 let inputQuantity = document.getElementById('quantity');
-inputQuantity.addEventListener('input', (e) =>{
+inputQuantity.addEventListener('input', (e) =>{ /*add event listener to quantity menu and limit value from 1 to 100*/
     if (e.target.value <= 0){
         e.target.value = 1;
     }
@@ -119,6 +119,7 @@ colorSelect.addEventListener('input', () => {
 let cartButton = document.getElementById('addToCart');
 cartButton.addEventListener('click', function (){
     addToCart();
+    alert('Votre produit a bien été ajouté au panier !');
     console.log(localStorage.getItem('cartContent'))
 });
 

@@ -1,7 +1,7 @@
 let confirmationRegex = new RegExp('confirmation')
 let cartRegex = new RegExp('cart')
 
-if(confirmationRegex.test(window.location.pathname)){
+if(confirmationRegex.test(window.location.pathname)){ /*Check page's url to execute either confirmation script or cart script*/
     let url = new URL(window.location)
     document.getElementById('orderId').innerText = url.searchParams.get("id");
 
@@ -14,7 +14,7 @@ if(confirmationRegex.test(window.location.pathname)){
 
     let cartPrice = 0;
 
-    cart.forEach((element, index) => {
+    cart.forEach((element, index) => {/*Create html elements for every product in the cart*/
         fetch(`http://localhost:3000/api/products/${element.id}`)
             .then(function (res){
                 if(res.ok) {
@@ -34,14 +34,14 @@ if(confirmationRegex.test(window.location.pathname)){
 
     totalOfProducts();
 
-    function totalOfProducts(){
+    function totalOfProducts(){/*Sum of products quantity in the cart*/
         const totalQuantity = document.getElementById('totalQuantity');
         let quantityArray = cart.map( v => v.quantity);
         totalQuantity.innerText = quantityArray.reduce((sum, current) => sum + current, 0) ;
 
     }
 
-    function totalOfCart(product, cart){
+    function totalOfCart(product, cart){ /*Sum of cart price*/
 
         const totalPrice = document.getElementById('totalPrice');
         cartPrice += product.price *  cart.quantity;
@@ -51,7 +51,7 @@ if(confirmationRegex.test(window.location.pathname)){
 
 
 
-    function createCartContent(product, cart) {
+    function createCartContent(product, cart) {/*Create HTML elements and add event listeners to quantity menu and delete button*/
         const article = document.createElement('article');
         article.setAttribute('class', 'cart__item');
         article.setAttribute('data-id', product._id);
@@ -130,7 +130,7 @@ if(confirmationRegex.test(window.location.pathname)){
 
 
 
-    function changeQuantity(e) {
+    function changeQuantity(e) {/*Change quantity value to input value and delete product if quantity = 0*/
         /*let priceRow = document.querySelectorAll('.cart__item__content p:nth-child(3)');*/ /*get the DOM element for the price*/
         let itemQuantity = e.target.closest('.itemQuantity');
         let article = e.target.closest('article');
@@ -152,7 +152,7 @@ if(confirmationRegex.test(window.location.pathname)){
     }
 
 
-    function recalculateCart(){
+    function recalculateCart(){/*after a modification, recalculate the sum of cart*/
         const totalPrice = document.getElementById('totalPrice');
         let cartPrice = 0
         if (cart.length === 0){
@@ -175,7 +175,7 @@ if(confirmationRegex.test(window.location.pathname)){
 
     }
 
-    function deleteProduct(item, cartIndex){
+    function deleteProduct(item, cartIndex){/*Delete product from local storage and from the page*/
         cart.splice(cartIndex, 1);
         item.remove();
         totalOfProducts();
@@ -195,7 +195,7 @@ if(confirmationRegex.test(window.location.pathname)){
 
     form();
 
-    function form(){
+    function form(){/*Add event listener to all fields and check validity of inputs*/
         const regExpName = new RegExp('^[a-zA-Z-áàâäãåçéèêëíìîïñóòôöõú ùûüýÿæœÁÀÂÄÃÅÇÉÈÊËÍÌÎÏÑÓÒÔÖÕÚÙÛÜÝŸÆŒ-]*$');
         const regExpAddress = new RegExp('^[a-zA-Z0-9.!#$%&áàâäãåçéèêëíìîïñóòôöõúùûüýÿæœÁÀÂÄÃÅÇÉÈÊËÍÌÎÏÑÓÒÔÖÕÚÙÛÜÝŸÆŒ]');
         const regExpEmail = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)
@@ -270,13 +270,13 @@ if(confirmationRegex.test(window.location.pathname)){
                 alert('Veuillez vérifier les champs du formulaire ')
             }
             else {
-                /*alert('Veuillez remplir tous les champs du formulaire ')*/
+                alert('Veuillez remplir tous les champs du formulaire ')
             }
 
         })
     }
 
-    function sendOrderRequest(firstName, lastName, address, city, email){
+    function sendOrderRequest(firstName, lastName, address, city, email){/*Send the order request w/ forms inputs and local storage cart to the API*/
         let products = [];
         let contact = {
             firstName: firstName.value,
